@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Collection3 {
+public class Collection3 {    //list collection hai
     public static void main(String[] args) {
         List<Integer> l = new ArrayList<>(); // Use generic type for ArrayList
         l.add(10);

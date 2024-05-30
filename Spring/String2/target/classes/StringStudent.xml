@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        
+    <bean class="com.Spring.Stduent123" name="stu1">
+        <property name="studentId">
+            <value>12</value>
+        </property>
+        
+        <property name="studentNAme">
+            <value>Adarsh Singh Rajput</value>
+        </property>
+        
+        <property name="certificate">
+            <value>JavaDeveloper</value>
+        </property>
+        
+        
+    </bean>
+</beans>

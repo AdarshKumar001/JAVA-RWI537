@@ -1,0 +1,154 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  var emailText=TextEditingController();
+  var passText=TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text("Lonig Page",style: TextStyle(fontSize: 25,color: Colors.red),),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Container(
+              width: 300,
+              child: TextField(
+                keyboardType: TextInputType.emailAddress,
+                controller: emailText,
+               // enabled: false, =disabledBorder: OutlineInputBorder( ke liye used hota hai
+                decoration: InputDecoration(
+                  hintText: "Entre Your Email",
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide(color: Colors.deepOrange,width: 3),),
+                    enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide(width: 3,color: Colors.indigo),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide(width: 3,color: Colors.black),
+                  ),
+                  suffixText: 'Email',
+                  prefixIcon: Icon(Icons.email,color: Colors.deepOrange,),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.remove_red_eye,color: Colors.deepOrange,),
+                    onPressed: (){
+                      print('object');
+                    },
+                  )
+              ),
+            ),
+          ),
+          ),
+          Container(height: 25,),
+
+          Center(
+            child: Container(
+              width: 300,
+              child: TextField(
+                keyboardType: TextInputType.phone,
+                // enabled: false, =disabledBorder: OutlineInputBorder( ke liye used hota hai
+                decoration: InputDecoration(
+                    hintText: "Entre Your No",
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: Colors.deepOrange,width: 3),),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(width: 3,color: Colors.indigo),
+                    ),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(width: 3,color: Colors.black),
+                    ),
+                    suffixText: 'Email',
+                    prefixIcon: Icon(Icons.phone,color: Colors.deepOrange,),
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.phone_android,color: Colors.deepOrange,),
+                      onPressed: (){
+                        print('object');
+                      },
+                    )
+                ),
+              ),
+            ),
+          ),
+          Container(height: 25),
+          Center(
+            child: Container(
+              width: 300,
+              child: TextField(
+                controller: passText,
+                obscureText: true,
+                obscuringCharacter: "*",
+                decoration: InputDecoration(
+                  hintText: "Enter Password",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide(color: Colors.deepOrange),
+                  ),
+                  suffixIcon: Icon(
+                    Icons.remove_red_eye,
+                    color: Colors.deepOrange,
+                  ),
+                  prefixIcon: Icon(Icons.lock,color: Colors.deepOrange,)
+                ),
+                 // For hiding the password
+              ),
+            ),
+          ),
+          Container(height: 55),
+          ElevatedButton(
+            onPressed: () {
+              String uEmail=emailText.text.toString();
+              String uPass=passText.text;
+              print('Email:$uEmail,pass:$uPass');
+            },
+            child: Text(
+              "Click",
+              style: TextStyle(fontSize: 25, color: Colors.deepOrange,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

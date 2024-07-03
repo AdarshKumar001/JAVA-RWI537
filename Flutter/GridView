@@ -1,0 +1,104 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final List<Color> arryColors = [
+    Colors.red,
+    Colors.indigo,
+    Colors.yellow,
+    Colors.blue,
+    Colors.purpleAccent,
+    Colors.green,
+    Colors.blueGrey
+  ];
+  callBack(){
+    print('Adarsh singh');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text('GridView'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+
+            ElevatedButton(onPressed: callBack,
+                child: Text("click me!",style: TextStyle(color: Colors.blue),),),   //callBack ka used huaa hau
+
+            SizedBox(height: 45,),
+            Container(
+              height: 200,  // Set a fixed height for the GridView
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 11,
+                mainAxisSpacing: 11,
+                children: arryColors.map((color) {
+                  return Container(color: color);
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 45),
+            Container(
+              height: 200,  // Set a fixed height for the GridView
+              child: GridView.extent(
+                maxCrossAxisExtent: 100,
+                children: arryColors.map((color) {
+                  return Container(color: color);
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 45),
+            Container(
+              height: 200,  // Set a fixed height for the GridView
+              child: GridView.builder(
+                itemCount: arryColors.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 11,
+                  crossAxisSpacing: 11,
+                ),
+                itemBuilder: (context, index) {
+                  return Container(color: arryColors[index]);
+                },
+              ),
+            ),
+            SizedBox(height: 45,),
+
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,206 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_cli/MainScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const PhoneAuthScreen(),
+    );
+  }
+}
+
+class PhoneAuthScreen extends StatefulWidget {
+  const PhoneAuthScreen({super.key});
+
+  @override
+  _PhoneAuthScreenState createState() => _PhoneAuthScreenState();
+}
+
+class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _otpController = TextEditingController();
+  String? _verificationId;
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Phone Authentication', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 40),
+              const Text(
+                'Enter your phone number to receive an OTP.',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: _phoneController,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  prefixText: '+91-', // Default country code
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _sendOtp,
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Send OTP', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                  textStyle: TextStyle(fontSize: 16),
+                ),
+              ),
+              SizedBox(height: 30),
+              if (_verificationId != null) ...[
+                const Text(
+                  'Enter the OTP sent to your phone:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: _otpController,
+                  decoration: InputDecoration(
+                    labelText: 'OTP',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _verifyOtp,
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Verify OTP', style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                    textStyle: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _sendOtp() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final phoneNumber = '+91-${_phoneController.text.trim()}';
+
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await _auth.signInWithCredential(credential);
+        _showSnackbar('Phone number automatically verified and user signed in.');
+        setState(() {
+          _isLoading = false;
+        });
+        // Optionally, navigate to another screen or update the UI
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        _showSnackbar('Phone number verification failed: ${e.message}');
+        setState(() {
+          _isLoading = false;
+        });
+        print('Verification failed: ${e.code} - ${e.message}');
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        _showSnackbar('OTP sent to $phoneNumber');
+        setState(() {
+          _verificationId = verificationId;
+          _isLoading = false;
+        });
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        _showSnackbar('OTP auto retrieval timeout');
+        setState(() {
+          _verificationId = verificationId;
+          _isLoading = false;
+        });
+      },
+    );
+  }
+
+  Future<void> _verifyOtp() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final otp = _otpController.text.trim();
+
+    if (_verificationId == null) {
+      _showSnackbar('Verification ID is null');
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    final credential = PhoneAuthProvider.credential(
+      verificationId: _verificationId!,
+      smsCode: otp,
+    );
+
+    try {
+      await _auth.signInWithCredential(credential);
+      _showSnackbar('Successfully signed in.');
+      setState(() {
+        _isLoading = false;
+        Navigator.push(context, MaterialPageRoute(builder: (context) =>MainScreen(),));
+      });
+      // Optionally, navigate to another screen or update the UI
+    } catch (e) {
+      _showSnackbar('Failed to sign in: ${e.toString()}');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+}
